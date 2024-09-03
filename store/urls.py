@@ -1,22 +1,18 @@
 from django.urls import path
-from django.urls.conf import include
-from rest_framework_nested import routers
-from . import views
+from .views import (
+    product_list, product_detail,
+    collection_list, collection_detail
+)
 
-router = routers.DefaultRouter()
-router.register('products', views.ProductViewSet, basename='products')
-router.register('collections', views.CollectionViewSet)
-router.register('carts', views.CartViewSet)
-router.register('customers', views.CustomerViewSet)
-router.register('orders', views.OrderViewSet, basename='orders')
+urlpatterns = [
+    # Product URLs
+    path('products/', product_list, name='product-list-create'),
+    path('products/<int:id>/', product_detail, name='product-detail'),
 
-products_router = routers.NestedDefaultRouter(
-    router, 'products', lookup='product')
-products_router.register('reviews', views.ReviewViewSet,
-                         basename='product-reviews')
+    # Collection URLs
+    path('collections/', collection_list, name='collection-list-create'),
+    path('collections/<int:pk>/', collection_detail, name='collection-detail'),
 
-carts_router = routers.NestedDefaultRouter(router, 'carts', lookup='cart')
-carts_router.register('items', views.CartItemViewSet, basename='cart-items')
-
-# URLConf
-urlpatterns = router.urls + products_router.urls + carts_router.urls
+    # As rotas para `Cart`, `Customer`, `Order`, etc. precisam ser definidas como em seu código original,
+    # mas vou removê-las aqui porque elas não estão sendo mencionadas nas views atuais.
+]
