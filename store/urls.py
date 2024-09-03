@@ -1,4 +1,5 @@
 from django.urls import path
+from graphene_django.views import GraphQLView
 from .views import (
     product_list, product_detail,
     collection_list, collection_detail
@@ -13,6 +14,6 @@ urlpatterns = [
     path('collections/', collection_list, name='collection-list-create'),
     path('collections/<int:pk>/', collection_detail, name='collection-detail'),
 
-    # As rotas para `Cart`, `Customer`, `Order`, etc. precisam ser definidas como em seu código original,
-    # mas vou removê-las aqui porque elas não estão sendo mencionadas nas views atuais.
+    # GraphQL endpoint
+    path("graphql/", GraphQLView.as_view(graphiql=True), name="graphql"),
 ]

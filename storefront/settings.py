@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'tags',
     'likes',
     'core',
+    'graphene_django',
 ]
 
 MIDDLEWARE = [
@@ -163,4 +164,8 @@ DJOSER = {
 SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('JWT',),
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1)
+}
+
+GRAPHENE = {
+    "SCHEMA": "store.schema.schema"  # Este é o caminho para o arquivo onde você definirá seu schema
 }
