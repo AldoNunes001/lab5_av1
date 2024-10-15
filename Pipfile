@@ -13,6 +13,7 @@ djoser = "*"
 djangorestframework-simplejwt = "*"
 graphene-django = "*"
 mysqlclient = "*"
+drf-yasg = "*"
 
 [dev-packages]
 autopep8 = "*"

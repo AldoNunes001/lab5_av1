@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'likes',
     'core',
     'graphene_django',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [

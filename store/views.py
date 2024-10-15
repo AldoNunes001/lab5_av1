@@ -42,7 +42,7 @@ class CollectionViewSet(ModelViewSet):
     permission_classes = [IsAdminOrReadOnly]
 
     def destroy(self, request, *args, **kwargs):
-        if Product.objects.filter(collection_id=kwargs['pk']):
+        if Product.objects.filter(collection_id=kwargs['pk']).exists():
             return Response({'error': 'Collection cannot be deleted because it includes one or more products.'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
         return super().destroy(request, *args, **kwargs)
@@ -52,10 +52,18 @@ class ReviewViewSet(ModelViewSet):
     serializer_class = ReviewSerializer
 
     def get_queryset(self):
-        return Review.objects.filter(product_id=self.kwargs['product_pk'])
+        # Evitar erro ao gerar o esquema do Swagger
+        if getattr(self, 'swagger_fake_view', False):
+            return Review.objects.none()
+
+        return Review.objects.filter(product_id=self.kwargs.get('product_pk'))
 
     def get_serializer_context(self):
-        return {'product_id': self.kwargs['product_pk']}
+        # Evitar erro ao gerar o esquema do Swagger
+        if getattr(self, 'swagger_fake_view', False):
+            return {}
+
+        return {'product_id': self.kwargs.get('product_pk')}
 
 
 class CartViewSet(CreateModelMixin,
@@ -77,11 +85,19 @@ class CartItemViewSet(ModelViewSet):
         return CartItemSerializer
 
     def get_serializer_context(self):
-        return {'cart_id': self.kwargs['cart_pk']}
+        # Evitar erro ao gerar o esquema do Swagger
+        if getattr(self, 'swagger_fake_view', False):
+            return {}
+
+        return {'cart_id': self.kwargs.get('cart_pk')}
 
     def get_queryset(self):
+        # Evitar erro ao gerar o esquema do Swagger
+        if getattr(self, 'swagger_fake_view', False):
+            return CartItem.objects.none()
+
         return CartItem.objects \
-            .filter(cart_id=self.kwargs['cart_pk']) \
+            .filter(cart_id=self.kwargs.get('cart_pk')) \
             .select_related('product')
 
 
@@ -96,8 +112,11 @@ class CustomerViewSet(ModelViewSet):
 
     @action(detail=False, methods=['GET', 'PUT'], permission_classes=[IsAuthenticated])
     def me(self, request):
-        customer = Customer.objects.get(
-            user_id=request.user.id)
+        # Evitar erro ao gerar o esquema do Swagger
+        if getattr(self, 'swagger_fake_view', False):
+            return Response({})
+
+        customer = get_object_or_404(Customer, user_id=request.user.id)
         if request.method == 'GET':
             serializer = CustomerSerializer(customer)
             return Response(serializer.data)
@@ -135,9 +154,12 @@ class OrderViewSet(ModelViewSet):
     def get_queryset(self):
         user = self.request.user
 
+        # Evitar erro ao gerar o esquema do Swagger
+        if getattr(self, 'swagger_fake_view', False):
+            return Order.objects.none()
+
         if user.is_staff:
             return Order.objects.all()
 
-        customer_id = Customer.objects.only(
-            'id').get(user_id=user.id)
-        return Order.objects.filter(customer_id=customer_id)
+        customer = get_object_or_404(Customer, user_id=user.id)
+        return Order.objects.filter(customer_id=customer.id)
