@@ -1,19 +1,22 @@
 from django.urls import path
-from graphene_django.views import GraphQLView
-from .views import (
-    product_list, product_detail,
-    collection_list, collection_detail
-)
+from django.urls.conf import include
+from rest_framework_nested import routers
+from . import views
 
-urlpatterns = [
-    # Product URLs
-    path('products/', product_list, name='product-list-create'),
-    path('products/<int:id>/', product_detail, name='product-detail'),
+router = routers.DefaultRouter()
+router.register('products', views.ProductViewSet, basename='products')
+router.register('collections', views.CollectionViewSet)
+router.register('carts', views.CartViewSet)
+router.register('customers', views.CustomerViewSet)
+router.register('orders', views.OrderViewSet, basename='orders')
 
-    # Collection URLs
-    path('collections/', collection_list, name='collection-list-create'),
-    path('collections/<int:pk>/', collection_detail, name='collection-detail'),
+products_router = routers.NestedDefaultRouter(
+    router, 'products', lookup='product')
+products_router.register('reviews', views.ReviewViewSet,
+                         basename='product-reviews')
 
-    # GraphQL endpoint
-    path("graphql/", GraphQLView.as_view(graphiql=True), name="graphql"),
-]
+carts_router = routers.NestedDefaultRouter(router, 'carts', lookup='cart')
+carts_router.register('items', views.CartItemViewSet, basename='cart-items')
+
+# URLConf
+urlpatterns = router.urls + products_router.urls + carts_router.urls

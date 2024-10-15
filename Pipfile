@@ -6,13 +6,13 @@ name = "pypi"
 [packages]
 django = "*"
 django-debug-toolbar = "*"
-mysqlclient = "*"
 djangorestframework = "*"
 drf-nested-routers = "*"
 django-filter = "*"
 djoser = "*"
 djangorestframework-simplejwt = "*"
 graphene-django = "*"
+mysqlclient = "*"
 
 [dev-packages]
 autopep8 = "*"
