@@ -1,5 +1,6 @@
 from store.permissions import FullDjangoModelPermissions, IsAdminOrReadOnly, ViewCustomerHistoryPermission
-from store.pagination import DefaultPagination
+# from store.pagination import DefaultPagination
+from store.pagination import PageNumberPagination
 from django.db.models.aggregates import Count
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -20,7 +21,8 @@ class ProductViewSet(ModelViewSet):
     serializer_class = ProductSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = ProductFilter
-    pagination_class = DefaultPagination
+    # pagination_class = DefaultPagination
+    pagination_class = PageNumberPagination
     permission_classes = [IsAdminOrReadOnly]
     search_fields = ['title', 'description']
     ordering_fields = ['unit_price', 'last_update']
